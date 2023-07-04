@@ -11,7 +11,7 @@ export default class AuthController {
       })
       return token
     } catch {
-      return response.unauthorized({ message: 'Invalid credentials' })
+      return response.unauthorized({ message: 'Email or Password incorrect' })
     }
   }
 
