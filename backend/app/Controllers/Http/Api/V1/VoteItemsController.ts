@@ -1,19 +1,30 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import { schema } from '@ioc:Adonis/Core/Validator'
 
+import { Parser } from '@json2csv/plainjs'
+
 import Vote from 'App/Models/Vote'
 import VoteItem from 'App/Models/VoteItem'
 
 export default class VoteItemsController {
   public async index({ request }: HttpContextContract) {
+    const q = request.input('q')
+    const sortBy = request.input('sortBy')
     const page = request.input('page', 1)
     const limit = request.input('limit', 10)
 
-    const paginatedVoteItem = await VoteItem.query()
-      .withCount('votes')
-      .preload('votes')
-      .orderBy('votes_count', 'desc')
-      .paginate(page, limit)
+    const voteItemQuery = VoteItem.query().withCount('votes').preload('votes')
+
+    if (q) {
+      voteItemQuery.whereILike('name', `%${q}%`).orWhereILike('description', `%${q}%`)
+    }
+
+    if (sortBy) {
+      const [column, direction] = sortBy.split(':')
+      voteItemQuery.orderBy(column, direction)
+    }
+
+    const paginatedVoteItem = await voteItemQuery.paginate(page, limit)
 
     return paginatedVoteItem
   }
@@ -96,9 +107,50 @@ export default class VoteItemsController {
     return voteItem
   }
 
+  public async vote({ auth, params, response }: HttpContextContract) {
+    const { id } = params
+
+    const alreadyVoted = await Vote.findBy('voteByUserId', auth.user?.id)
+
+    if (alreadyVoted) {
+      return response.conflict({ message: 'already voted' })
+    }
+
+    const voteItem = await VoteItem.findOrFail(id)
+
+    const vote = await Vote.create({
+      voteItemId: voteItem.id,
+      voteByUserId: auth.user?.id,
+    })
+
+    return vote
+  }
+
   public async clear({}: HttpContextContract) {
     const voteItems = await VoteItem.query().delete()
 
     return voteItems
+  }
+
+  public async export({ response }: HttpContextContract) {
+    const voteItems = await VoteItem.query()
+      .withCount('votes')
+      .preload('votes')
+      .orderBy('votes_count', 'desc')
+
+    const voteItemsJSON = voteItems.map((voteItem) => voteItem.serialize())
+
+    const data = voteItemsJSON.map((voteItem) => {
+      return {
+        name: voteItem.name,
+        description: voteItem.description,
+        vote_count: voteItem.votes.length,
+      }
+    })
+    const parser = new Parser()
+    const csv = parser.parse(data)
+
+    response.attachment('vote-items.csv')
+    return response.send(csv)
   }
 }

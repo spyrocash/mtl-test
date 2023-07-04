@@ -32,6 +32,9 @@ Route.group(() => {
       Route.get('me', 'Api/V1/AuthController.me').middleware(['auth'])
     }).prefix('/auth')
 
+    Route.post('vote-items/:id/vote', 'Api/V1/VoteItemsController.vote').middleware(['auth'])
+    Route.post('vote-items/clear', 'Api/V1/VoteItemsController.clear').middleware(['auth'])
+    Route.get('vote-items/export', 'Api/V1/VoteItemsController.export')
     Route.resource('vote-items', 'Api/V1/VoteItemsController').middleware({
       index: ['auth'],
       store: ['auth'],
@@ -39,8 +42,5 @@ Route.group(() => {
       update: ['auth'],
       destroy: ['auth'],
     })
-    Route.post('vote-items/clear', 'Api/V1/VoteItemsController.clear').middleware(['auth'])
-
-    Route.post('votes/:voteItemId', 'Api/V1/VotesController.vote').middleware(['auth'])
   }).prefix('/v1')
 }).prefix('/api')
