@@ -1,5 +1,5 @@
-import type { ReactElement } from "react";
-import type { GetServerSideProps } from "next";
+// import type { ReactElement } from "react";
+// import type { GetServerSideProps } from "next";
 import type { NextPageWithLayout } from "@/pages/_app";
 import Image from "next/image";
 
@@ -11,7 +11,10 @@ import { Button, Form, Input, Typography, Space } from "antd";
 import LayoutAuth from "@/components/layouts/auth";
 
 // hooks
-import { useAuth, serverGetMe } from "@/hooks/auth";
+import {
+  useAuth,
+  // serverGetMe
+} from "@/hooks/auth";
 
 // services
 import { ApiLoginRequest } from "@/services/auth";
@@ -28,7 +31,7 @@ const Login: NextPageWithLayout = () => {
   };
 
   return (
-    <>
+    <LayoutAuth title="Login">
       <div className="login-page">
         <div className="login-form-container">
           <div className="login-form-block">
@@ -123,30 +126,30 @@ const Login: NextPageWithLayout = () => {
           padding: 20px;
         }
       `}</style>
-    </>
+    </LayoutAuth>
   );
 };
 
-Login.getLayout = function getLayout(page: ReactElement) {
-  return <LayoutAuth title="Login">{page}</LayoutAuth>;
-};
+// Login.getLayout = function getLayout(page: ReactElement) {
+//   return <LayoutAuth title="Login">{page}</LayoutAuth>;
+// };
 
-export const getServerSideProps: GetServerSideProps<{}> = async ({
-  res,
-  req,
-}) => {
-  const user = await serverGetMe({ res, req });
+// export const getServerSideProps: GetServerSideProps<{}> = async ({
+//   res,
+//   req,
+// }) => {
+//   const user = await serverGetMe({ res, req });
 
-  if (user) {
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
-    };
-  }
+//   if (user) {
+//     return {
+//       redirect: {
+//         destination: "/",
+//         permanent: false,
+//       },
+//     };
+//   }
 
-  return { props: { user } };
-};
+//   return { props: { user } };
+// };
 
 export default Login;

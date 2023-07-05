@@ -11,7 +11,9 @@ type UseVoteItemsProps = ApiGetListVoteItemRequestParams & {};
 
 export const useVoteItems = (props: UseVoteItemsProps) => {
   const fetcher: Fetcher<any, ApiGetListVoteItemRequestParams> = (params) => {
-    return apiGetListVoteItem(params).then((res) => res.data);
+    return apiGetListVoteItem(params)
+      .then((res) => res.data)
+      .catch(() => null);
   };
 
   // vars

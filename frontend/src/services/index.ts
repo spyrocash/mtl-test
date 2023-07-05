@@ -1,7 +1,10 @@
 import axios, { AxiosError } from "axios";
 
 // cookies
-import { getTokenCookie } from "@/cookies/auth";
+// import { getTokenCookie } from "@/cookies/auth";
+
+// storages
+import { getTokenStorage } from "@/storages/auth";
 
 export const mainService = axios.create({
   baseURL: `${process.env.NEXT_PUBLIC_API_URL}/api/v1`,
@@ -11,7 +14,8 @@ export const mainService = axios.create({
 mainService.interceptors.request.use(
   function (config) {
     // Do something before request is sent
-    const token = getTokenCookie();
+    // const token = getTokenCookie();
+    const token = getTokenStorage();
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -37,8 +41,8 @@ mainService.interceptors.response.use(
     // Do something with response error
     const errorMessage = handleAxiosErrorMessage(error);
     if (errorMessage === "E_UNAUTHORIZED_ACCESS: Unauthorized access") {
-      alert("Session timeout");
-      window.location.replace(`${window.location.origin}/login`);
+      // alert("Session timeout");
+      // window.location.replace(`${window.location.origin}/login`);
     }
 
     return Promise.reject(error);

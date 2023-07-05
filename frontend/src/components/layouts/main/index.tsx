@@ -17,7 +17,7 @@ import logoImage from "../../../../public/assets/images/logo.svg";
 type LayoutMainProps = {
   title: string;
   children: React.ReactNode;
-  user: ApiMeResponse;
+  user?: ApiMeResponse | null | undefined;
 };
 
 export default function LayoutMain(props: LayoutMainProps) {
@@ -77,7 +77,7 @@ export default function LayoutMain(props: LayoutMainProps) {
                 <Space>
                   <Avatar icon={<UserOutlined />} />
                   <Typography.Text style={{ color: "#ffffff" }}>
-                    {user.email}
+                    {user?.email}
                   </Typography.Text>
                   <DownOutlined />
                 </Space>
