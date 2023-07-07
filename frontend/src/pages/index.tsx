@@ -16,6 +16,7 @@ import {
   Select,
   Typography,
   Button,
+  Empty,
 } from "antd";
 
 // components
@@ -34,10 +35,15 @@ import { useVoteItems } from "@/hooks/vote-item";
 
 const Home: NextPageWithLayout = () => {
   // states
-  const [page, setPage] = useState(1);
-  const [limit] = useState(12);
-  const [searchValue, setSearchValue] = useState("");
-  const [sortVoteCount, setSortVoteCount] = useState("votes_count:desc");
+  const [searchParams, setSearchParams] = useState({
+    page: 1,
+    limit: 12,
+    searchValue: "",
+    sortVoteCount: "votes_count:desc",
+  });
+
+  // vars
+  const { page, limit, searchValue, sortVoteCount } = searchParams;
 
   // hooks
   const { user, isReady: isUserReady } = useMe();
@@ -60,7 +66,11 @@ const Home: NextPageWithLayout = () => {
                 allowClear
                 placeholder="Search"
                 onSearch={(v) => {
-                  setSearchValue(v);
+                  setSearchParams({
+                    ...searchParams,
+                    page: 1,
+                    searchValue: v,
+                  });
                 }}
                 enterButton
               />
@@ -85,7 +95,10 @@ const Home: NextPageWithLayout = () => {
                     },
                   ]}
                   onChange={(v) => {
-                    setSortVoteCount(v);
+                    setSearchParams({
+                      ...searchParams,
+                      sortVoteCount: v,
+                    });
                   }}
                 />
               </Space>
@@ -104,48 +117,57 @@ const Home: NextPageWithLayout = () => {
 
         <br />
 
-        <Space direction="vertical" style={{ width: "100%" }}>
-          <Row gutter={[16, 16]}>
-            {isVoteItemLoading ? (
-              <>
-                {_.map(_.times(3), (index) => {
-                  return (
-                    <Col span={24} md={12} xl={8} key={index}>
-                      <CardVoteItem loading={isVoteItemLoading} />
-                    </Col>
-                  );
-                })}
-              </>
-            ) : (
-              <>
-                {_.map(voteItem?.data, (item) => {
-                  return (
-                    <Col span={24} md={12} xl={8} key={item.id}>
-                      <CardVoteItem
-                        id={item.id}
-                        name={item.name}
-                        description={item.description}
-                        voteCount={item.votes.length}
-                      />
-                    </Col>
-                  );
-                })}
-              </>
-            )}
-          </Row>
+        <Row gutter={[16, 16]}>
+          {isVoteItemLoading ? (
+            <>
+              {_.map(_.times(3), (index) => {
+                return (
+                  <Col span={24} md={12} xl={8} key={index}>
+                    <CardVoteItem loading={isVoteItemLoading} />
+                  </Col>
+                );
+              })}
+            </>
+          ) : (
+            <>
+              {_.map(voteItem?.data, (item) => {
+                return (
+                  <Col span={24} md={12} xl={8} key={item.id}>
+                    <CardVoteItem
+                      id={item.id}
+                      name={item.name}
+                      description={item.description}
+                      voteCount={item.votes.length}
+                    />
+                  </Col>
+                );
+              })}
+            </>
+          )}
+        </Row>
 
-          <br />
+        {!isVoteItemLoading && _.isEmpty(voteItem?.data) && (
+          <div style={{ textAlign: "center" }}>
+            <Empty />
+          </div>
+        )}
 
+        <br />
+
+        {!_.isEmpty(voteItem?.data) && (
           <div style={{ textAlign: "center" }}>
             <Pagination
               total={voteItem?.meta.total}
               current={page}
               onChange={(v) => {
-                setPage(v);
+                setSearchParams({
+                  ...searchParams,
+                  page: v,
+                });
               }}
             />
           </div>
-        </Space>
+        )}
       </div>
     </LayoutMain>
   );
