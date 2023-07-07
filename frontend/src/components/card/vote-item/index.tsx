@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // antd
 import {
@@ -36,6 +36,14 @@ export default function CardVoteItem(props: CardVoteItemProps) {
 
   // states
   const [voteCount, setVoteCount] = useState<number>(defaultVoteCount);
+
+  useEffect(() => {
+    if (defaultVoteCount !== voteCount) {
+      setVoteCount(defaultVoteCount);
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultVoteCount]);
 
   return (
     <>
