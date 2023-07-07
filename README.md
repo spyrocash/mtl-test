@@ -11,12 +11,12 @@
    docker exec -it mtl-backend /bin/sh
    ```
 
-3. Migration database
+3. Migration database (inside mtl-backend container)
    ```sh
    node ace migration:run --force
    ```
 
-4. Seed database
+4. Seed database (inside mtl-backend container)
    ```sh
    node ace db:seed
    ```
@@ -30,6 +30,17 @@ Open http://localhost:3001.
 - email: admin3@example.com / password: admin3
 - email: admin4@example.com / password: admin4
 - email: admin5@example.com / password: admin5
+
+## How to run unit tests
+1. Connect to mtl-backend docker
+   ```sh
+   docker exec -it mtl-backend /bin/sh
+   ```
+
+2. Run unit tests
+   ```sh
+   node ace test
+   ```
 
 ## Postman
 ```javascript
